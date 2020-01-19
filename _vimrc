@@ -48,7 +48,17 @@ set nobackup
 set cindent
 set smartindent
 set expandtab
+
+set tags=./tags;/,tags;/
+set mouse=a
+set hlsearch
+set shiftwidth=4
+
+
+autocmd FileType make setlocal noexpandtab
+autocmd FileType c setlocal expandtab cindent  
 set exrc
+set secure
 set nocompatible              " be iMproved, required
 filetype off                  " required
 
@@ -67,8 +77,18 @@ Plugin 'scrooloose/nerdtree'
 " All of your Plugins must be added before the following line
 Plugin 'taglist.vim'
 Plugin 'CRefVim'
+Plugin 'c.vim'
 "Plugin 'Valloric/YouCompleteMe'
 call vundle#end()            " required
 filetype plugin indent on    " required
 " To ignore plugin indent changes, instead use:
 "filetype plugin on
+autocmd VimENter * NERDTree
+autocmd VimENter * Tlist
+nnoremap <F9> :r !make
+autocmd VimENter * tabnew
+autocmd VimENter * tabfirst
+let Tlist_Display_Prototype=1
+colorscheme desert
+nnoremap C !gcc -Wall -Wpedantic % -o %:r
+
