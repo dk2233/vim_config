@@ -90,5 +90,5 @@ autocmd VimENter * tabnew
 autocmd VimENter * tabfirst
 let Tlist_Display_Prototype=1
 colorscheme desert
-nnoremap C !gcc -Wall -Wpedantic % -o %:r
+nnoremap C :!gcc -Wall -Wpedantic % -o %:r
 
