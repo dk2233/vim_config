@@ -77,8 +77,14 @@ Plugin 'scrooloose/nerdtree'
 " All of your Plugins must be added before the following line
 Plugin 'taglist.vim'
 Plugin 'CRefVim'
-Plugin 'c.vim'
 "Plugin 'Valloric/YouCompleteMe'
+Plugin 'junegunn/fzf.vim'
+Plugin 'junegunn/fzf'
+Plugin 'c.vim'
+Plugin 'kendling/taghighlight'
+Plugin 'git://github.com/xolox/vim-misc'
+Plugin 'git://github.com/xolox/vim-shell'
+Plugin 'gyim/vim-boxdraw'
 call vundle#end()            " required
 filetype plugin indent on    " required
 " To ignore plugin indent changes, instead use:
@@ -89,13 +95,32 @@ nnoremap <F9> :r !make
 autocmd VimENter * tabnew
 autocmd VimENter * tabfirst
 let Tlist_Display_Prototype=1
+let Tlist_Sort_Type="name"
 colorscheme desert
 nnoremap C :!gcc -Wall -Wpedantic % -o %:r
+
+
+augroup cmm
+  au!
+  autocmd BufNewFile,BufRead *.cmm   set syntax=practice
+augroup END
+
+augroup sx
+    au!
+    autocmd BufNewFile,BufRead *.sx set syntax=srec
+augroup END
+
+augroup dld
+    au!
+    autocmd BufNewFile,BufRead *.dld set syntax=ld
+augroup END
 
 fu! GenCscope()
     cs kill 0
     !cscope -bq
     cs add cscope.out
+
+endfunction
 
 nnoremap rc :call GenCscope()<cr>
 
