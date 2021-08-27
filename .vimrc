@@ -1,26 +1,73 @@
-
+"---------------------------------------------------------------------------------
+let g:is_this_windows = 0
+let g:is_gui_here = 0
+let g:line_border_length = 50
+"---------------------------------------------------------------------------------
+"|  ++  +--+     +-----+         +-------------------+
+"|  ||  |  |     |     |         |                   |
+"|  ||  |  |     |     |         | Functions.......  |
+"|--++--+  +-----+     +---------+                   |
+"+---------------------------------------------------+
+"{{{
 function! StatuslineGit()
   let l:branchname = GitBranch()
   return strlen(l:branchname) > 0?'  '.l:branchname.' ':''
 endfunction
 
-source $VIMRUNTIME/vimrc_example.vim
-source $VIMRUNTIME/mswin.vim
-set rtp+=$HOME\.vim\after
-
-
-set pythondll=c:\sw_tools\Python-2.7.17x64\App\Python\python27.dll
-
-
-if has("win32") || has("win16")
-"set pythonthreedll=c:\TESTUS\python\python-3.6.6.amd64\python36.dll 
-endif
-set directory+=$HOME/tmp
-
-set encoding=utf8
-
+function! GuiWasStarted()
+    " set global variable if gui was started
+    let g:is_gui_here = 1
+    echom "gui is started"
 "set guifont=Lucida_Console:h10:cEASTEUROPE:qDRAFT
 set guifont=Arial_monospaced_for_SAP:h10:cEASTEUROPE:qDRAFT
+endfunction
+
+function! WinOrNoWin()
+    if has("win32") || has("win16")
+        " is this on windows VIM
+        " {{{
+        source $VIMRUNTIME/vimrc_example.vim
+        source $VIMRUNTIME/mswin.vim
+
+        set pythondll=c:\sw_tools\Python-2.7.17x64\App\Python\python27.dll
+
+        "set pythonthreedll=c:\TESTUS\python\python-3.6.6.amd64\python36.dll 
+        let g:is_this_windows = 1
+    endif
+    "}}}
+endfu
+
+fu! GenCscope()
+    cs kill 0
+    !cscope -bq
+    cs add cscope.out
+endfunction
+
+fu! DrawCommentline(size)
+    exe "normal! i\"\<esc>"
+    exe "normal! a\-\<esc>"
+"    echo a:size
+    exe "normal! ".a:size."\.\$\<cr>"
+endfunction
+"--------------------------------------------------{{{
+"----------------------------------------------------------------------------------
+"<esc"<esc>>
+"---------------------------------------------------------------------------------
+call WinOrNoWin()
+
+
+augroup gui_settings
+    autocmd GUIEnter * call GuiWasStarted()  
+augroup END
+
+
+set rtp+=$HOME\.vim\after
+"this is to add Vundle!
+set rtp+=$HOME/.vim/bundle/Vundle.vim
+
+set directory+=$HOME/tmp
+set encoding=utf8
+
 set colorcolumn=110
 "highlight ColorColumn ctermbg=darkgray
 set tabstop=4
@@ -36,8 +83,12 @@ set tags=./tags;/,tags;/
 set mouse=a
 set hlsearch
 set shiftwidth=4
-colorscheme deus
+colorscheme termschool 
+"deus
 "carbonized-dark
+"blue
+"
+set relativenumber
 
 
 set exrc
@@ -45,11 +96,11 @@ set secure
 set nocompatible              " be iMproved, required
 filetype off                  " required
 
+let mapLeader = "\\" 
 
 syntax enable
 filetype plugin indent on    " required
 " set the runtime path to include Vundle and initialize
-set rtp+=$HOME/.vim/bundle/Vundle.vim
 call vundle#begin()
 " alternatively, pass a path where Vundle should install plugins
 "call vundle#begin('~/some/path/here')
@@ -93,24 +144,30 @@ call vundle#end()            " required
 
 " To ignore plugin indent changes, instead use:
 "filetype plugin on
-autocmd VimENter * Tlist
+"autocmd VimENter * Tlist
 ""nerdtree first
 ""tlist will be second 
-autocmd VimENter * NERDTree
-autocmd VimENter * tabnew
-autocmd VimENter * tabfirst
+augroup vim_start
+    autocmd VimENter * NERDTree
+    autocmd VimENter * tabnew
+    autocmd VimENter * tabnew
+    autocmd VimENter * tabfirst
+augroup END
 let Tlist_Display_Prototype=1
 let Tlist_Sort_Type="name"
 
-"C settings
-nnoremap C :!gcc -Wall -Wpedantic % -o %:r
-
-nnoremap <F9> :r !make
-
 augroup c,h
     autocmd FileType make setlocal noexpandtab
-    autocmd FileType c setlocal expandtab cindent  
+    autocmd FileType *.c setlocal expandtab cindent  
+    autocmd FileType *.h setlocal expandtab cindent  
     iab <buffer> #i #include
+    iab <buffer> #d #define
+    iab tc334 make TC334_BoschCG90x_Dual_SMI8_Vector
+    "C settings
+    nnoremap C :!gcc -Wall -Wpedantic % -o %:r
+
+    nnoremap <F9> :r !make
+
 augroup END
 
 """"""""""""""""""""""""""""""""""""""""""""""""""
@@ -131,23 +188,18 @@ augroup dld
 augroup END
 """"""""""""""""""""""""""""""""""""""""""""""""""
 "cscope
-fu! GenCscope()
-    cs kill 0
-    !cscope -bq
-    cs add cscope.out
-endfunction
 
 nnoremap rc :call GenCscope()<cr>
 """""""""""""""""""""
 
 """"""""""""""""""""""""""""""""""""""""""""""""""
 "cscope settings
-nmap <unique> <C-\>s :cs find s <C-R>=expand("<cword>")<CR><CR>
+nmap <C-\>s :cs find s <C-R>=expand("<cword>")<CR><CR>
 nmap <C-\>g :cs find g <C-R>=expand("<cword>")<CR><CR>
 nmap <C-\>c :cs find c <C-R>=expand("<cword>")<CR><CR>
 nmap <C-\>t :cs find t <C-R>=expand("<cword>")<CR><CR>
 nmap <C-\>e :cs find e <C-R>=expand("<cword>")<CR><CR>
-nmap <C-\>f :cs find f <C-R>=expand("<cfile>")<CR><CR>
+nmap <Leader>f :cs find f <C-R>=expand("<cfile>")<CR><CR>
 nmap <C-\>i :cs find i ^<C-R>=expand("<cfile>")<CR>$<CR>
 nmap <C-\>d :cs find d <C-R>=expand("<cword>")<CR><CR>
 nmap <C-\>a :cs find a <C-R>=expand("<cword>")<CR><CR>
@@ -178,7 +230,8 @@ set statusline+=\ %f
 set statusline+=%m\
 set statusline+=\ \|Lines:[%L]
 set statusline+=\|Bu:[%n] 
-set statusline+=%=
+"set statusline+=%=
+"set statusline+=\
 set statusline+=%#CursorColumn#
 set statusline+=\ %y
 set statusline+=\ %{&fileencoding?&fileencoding:&encoding}
@@ -210,25 +263,33 @@ let g:syntastic_check_on_wq = 0
 let g:syntastic_mode_map = {
             \ "mode": "active",
             \ "active_filetypes": ["rust", "h"],
-            \ "passive_filetypes": ["python", "c"] }
+            \ "passive_filetypes": ["python" ] }
 " C C++
 let g:syntastic_c_no_default_include_dirs = 1
 let g:syntastic_c_check_header = 1
 "let g:syntastic_c_no_include_search = 1
-let g:syntastic_c_compiler='gcc.exe'
+let g:syntastic_c_compiler='gcc'
 let g:syntastic_c_checkers=['gcc']
 "['clang_check','gcc']
 let g:syntastic_c_checker='gcc'
 "let g:syntastic_c_compiler_options="-Wall -std=c99"
 let g:syntastic_c_config_file='.syntastic_c_config'
-let g:syntastic_disabled_filetypes = ['c']
+"let g:syntastic_disabled_filetypes = ['c']
 
 
 autocmd VimENter * tabNext
-if has("win32") || has("win16")
-    autocmd VimENter * terminal cmd
+if g:is_this_windows == 1
+    "has("win32") || has("win16")
+    echom "I am started on Windows env"
 else
-    autocmd VimENter * term bash
+    echom "I am on linux or Robot"
+"    autocmd VimENter * term bash
+endif
+
+if g:is_gui_here == 1
+    " only on GUI I am staring command line
+    autocmd VimENter * terminal cmd
+
 endif
 autocmd VimENter * tabfirst
 
@@ -256,9 +317,23 @@ inoremap <expr> <c-x><c-l> fzf#vim#complete(fzf#wrap({
 
 "Plugin NerdTree
 ca nerdr NERDTreeRefresh
-nmap <C-T>R :NERDTreeRefresh<CR>
-ca xxd1 %!xxd -ps -c 1024 
+nnoremap nR :NERDTreeRefresh<CR>
+nnoremap <Leader>nn :NERDTree<cr><c-w>l
+"this will not work with nnoremap
+"nnoremap il :exe "normal! i\-\<esc>80\."
+"this is better (not best) version:
+"nnoremap il :exe "normal! i\"\-"<esc>:exec "normal! 80\.\$"<cr>
+"---------------------------------------------------------------------------------
 
-ca ct  :!ctags -R -L cscope.files<CR> 
+nnoremap iL :call DrawCommentline(g:line_border_length)<cr> 
+"---------------------------------------------------
+augroup general
+    ca xxd1 %!xxd -ps -c 1024 
+    ca ct  :!ctags -R -L cscope.files<CR> 
+nnoremap dfp :diffput<CR>
+nnoremap dfg :diffget<CR>
+augroup END
 
-iab tc334 make TC334_BoschCG90x_Dual_SMI8_Vector
+onoremap " i"
+echo "Hi >^.^<"
+
