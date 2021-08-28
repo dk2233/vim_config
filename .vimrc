@@ -33,6 +33,8 @@ function! WinOrNoWin()
 
         "set pythonthreedll=c:\TESTUS\python\python-3.6.6.amd64\python36.dll 
         let g:is_this_windows = 1
+    else 
+        "this is for not windows
     endif
     "}}}
 endfu
@@ -56,8 +58,12 @@ endfunction
 call WinOrNoWin()
 
 
+" this is run too late and not function properly
 augroup gui_settings
-    autocmd GUIEnter * call GuiWasStarted()  
+    "autocmd GUIEnter * call GuiWasStarted()  
+    if has("gui_running")
+        call GuiWasStarted()
+    endif
 augroup END
 
 
@@ -163,6 +169,7 @@ augroup c,h
     iab <buffer> #i #include
     iab <buffer> #d #define
     iab tc334 make TC334_BoschCG90x_Dual_SMI8_Vector
+    iab tc364 make TC334_BoschCG90x_Dual_SMI8_Vector
     "C settings
     nnoremap C :!gcc -Wall -Wpedantic % -o %:r
 
@@ -288,7 +295,12 @@ endif
 
 if g:is_gui_here == 1
     " only on GUI I am staring command line
-    autocmd VimENter * terminal cmd
+    echom "Starting Cmd"
+    if g:is_this_windows==1
+        autocmd VimENter * terminal cmd 
+    else
+        autocmd VimENter * term bash       
+    endif
 
 endif
 autocmd VimENter * tabfirst
@@ -330,10 +342,19 @@ nnoremap iL :call DrawCommentline(g:line_border_length)<cr>
 augroup general
     ca xxd1 %!xxd -ps -c 1024 
     ca ct  :!ctags -R -L cscope.files<CR> 
-nnoremap dfp :diffput<CR>
-nnoremap dfg :diffget<CR>
+    nnoremap dfp :diffput<CR>
+    nnoremap dfg :diffget<CR>
+    "this is to distinguish that we are in vim diff mode
+    "and to enable additional keyboard mapping
+    if &diff
+
+        map dg :diffget<CR>
+        map dp :diffput<CR>
+        map dn ]c
+    endif 
 augroup END
 
 onoremap " i"
 echo "Hi >^.^<"
 
+autocmd VimENter * tabfirst
