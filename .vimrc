@@ -89,7 +89,12 @@ set tags=./tags;/,tags;/
 set mouse=a
 set hlsearch
 set shiftwidth=4
-colorscheme termschool 
+if g:is_gui_here==1
+
+    colorscheme termschool 
+else
+    colorscheme atom
+endif 
 "deus
 "carbonized-dark
 "blue
@@ -149,12 +154,14 @@ Plugin 'DrawIt'
 call vundle#end()            " required
 
 " To ignore plugin indent changes, instead use:
-"filetype plugin on
+filetype plugin on
 "autocmd VimENter * Tlist
 ""nerdtree first
 ""tlist will be second 
 augroup vim_start
-    autocmd VimENter * NERDTree
+    if &diff == 0
+        autocmd VimENter * NERDTree
+    endif
     autocmd VimENter * tabnew
     autocmd VimENter * tabnew
     autocmd VimENter * tabfirst
