@@ -17,7 +17,7 @@ endfunction
 function! GuiWasStarted()
     " set global variable if gui was started
     let g:is_gui_here = 1
-    echom "gui is started"
+    "echo "gui is started"
 "set guifont=Lucida_Console:h10:cEASTEUROPE:qDRAFT
 set guifont=Arial_monospaced_for_SAP:h10:cEASTEUROPE:qDRAFT
 endfunction
@@ -116,6 +116,7 @@ call vundle#begin()
 " alternatively, pass a path where Vundle should install plugins
 "call vundle#begin('~/some/path/here')
 
+"{{{
 " let Vundle manage Vundle, required
 Plugin 'VundleVim/Vundle.vim'
 " plugin on GitHub repo
@@ -138,6 +139,8 @@ Plugin 'racer-rust/vim-racer'
 Plugin 'https://github.com/vim-syntastic/syntastic.git'
 Plugin 'DrawIt'
 Plugin 'git://github.com/rafi/awesome-vim-colorschemes'
+Plugin 'neoclide/coc.nvim'
+
 "Plugin 'VFT--VIM-Form-Toolkit'
 "Plugin 'marcweber/vim-addon-manager'
 "Plugin 'luchermitte/lh-cpp'
@@ -161,7 +164,8 @@ filetype plugin on
 ""tlist will be second 
 augroup vim_start
     if &diff == 0
-        autocmd VimENter * NERDTree
+        "I do not want Nerd to be started autom
+        "autocmd VimENter * NERDTree
     endif
     autocmd VimENter * tabnew
     autocmd VimENter * tabnew
@@ -177,6 +181,7 @@ augroup c,h
     iab <buffer> #i #include
     iab <buffer> #d #define
     iab tc334 make TC334_BoschCG90x_Dual_SMI8_Vector
+    iab tc333 make TC333_BoschCG90x_SMI8_Vector
     iab tc364 make TC334_BoschCG90x_Dual_SMI8_Vector
     "C settings
     nnoremap C :!gcc -Wall -Wpedantic % -o %:r
@@ -258,7 +263,12 @@ set statusline+=%{SyntasticStatuslineFlag()}
 set statusline+=\ 
 
 
+augroup xml
 
+    autocmd!
+    autocmd FileType xml nnoremap rf :%s/<FLAG .*">//g<CR>
+    autocmd FileType xml nnoremap rF :%s/<\/\a*>//g<CR>
+augroup END
 
 
 "plugin Syntastic
@@ -284,8 +294,9 @@ let g:syntastic_c_no_default_include_dirs = 1
 let g:syntastic_c_check_header = 1
 "let g:syntastic_c_no_include_search = 1
 let g:syntastic_c_compiler='gcc'
-let g:syntastic_c_checkers=['gcc']
-"['clang_check','gcc']
+let g:syntastic_c_checkers=['gcc', 'clang_check','gcc']
+"let g:syntastic_c_checker='gcc'
+
 let g:syntastic_c_checker='gcc'
 "let g:syntastic_c_compiler_options="-Wall -std=c99"
 let g:syntastic_c_config_file='.syntastic_c_config'
@@ -295,15 +306,15 @@ let g:syntastic_c_config_file='.syntastic_c_config'
 autocmd VimENter * tabNext
 if g:is_this_windows == 1
     "has("win32") || has("win16")
-    echom "I am started on Windows env"
+    "echo "I am started on Windows env"
 else
-    echom "I am on linux or Robot"
+    echo "I am on linux or Robot"
 "    autocmd VimENter * term bash
 endif
 
-if g:is_gui_here == 1
+if g:is_gui_here == 1  && &diff==0 
     " only on GUI I am staring command line
-    echom "Starting Cmd"
+    "echom "Starting Cmd"
     if g:is_this_windows==1
         autocmd VimENter * terminal cmd 
     else
@@ -360,9 +371,19 @@ augroup general
         map dp :diffput<CR>
         map dn ]c
     endif 
+
+
+    :nnoremap <Leader>tn :tabnew<CR>
+    :nnoremap <Leader>b :buffers<CR>
+
 augroup END
 
 onoremap " i"
-echo "Hi >^.^<"
+"echo "Hi >^.^<"
 
 autocmd VimENter * tabfirst
+"---------------------------------------------------
+"this will make backup and ~swap file to be created in one .vim folder 
+set backupdir=~/.vim/backup//
+set directory=~/.vim/swap//
+set undodir=~/.vim/undo//
