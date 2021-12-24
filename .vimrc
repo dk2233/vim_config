@@ -75,7 +75,6 @@ set directory+=$HOME/tmp
 set encoding=utf8
 
 set colorcolumn=110
-"highlight ColorColumn ctermbg=darkgray
 set tabstop=4
 set shiftwidth=4
 set number
